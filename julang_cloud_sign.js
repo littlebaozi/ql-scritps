@@ -1,8 +1,11 @@
 const scriptName = "JulangCloud";
-let magicJS = MagicJS(scriptName, "INFO");
 const $ = new Env("JulangCloud签到");
 const notify = $.isNode() ? require('./sendNotify') : '';
-
+let JULANG_COOKIE = process.env.JULANG_COOKIE;
+if (!JULANG_COOKIE) {
+    console.log('请先添加环境变量JULANG_COOKIE')
+    return
+}
 //签到
 function SignIn(cookie) {
   return new Promise((resolve) => {
@@ -40,8 +43,13 @@ function SignIn(cookie) {
   });
 }
 
-try {
-  result = await SignIn(process.env.JULANG_COOKIE)
-} catch (err) {
-  console.log(`执行任务出现异常：${err}`);
-}
+!(async () => {
+   await SignIn(JULANG_COOKIE)
+    
+})()
+.catch((e) => {
+  $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
+})
+.finally(() => {
+  $.done();
+})
